@@ -12,44 +12,61 @@ client.on("error", function(error) {
     console.error("SerialPort Error: ", error);
 });
 
-    client.setTimeout (250);
+client.setTimeout (250);
 
 function doModbus() {
-    client.connectRTUBuffered ("/dev/ttyUSB0", { baudRate: 2400, parity: "none", dataBits: 8, stopBits: 1 })
-        .then(async function()
-        {
-            await readModbusData(1)
-            await readModbusData(2)
-            await readModbusData(3)
-	setTimeout(() => {process.exit(0)}, 1000)
-        })
-        .catch(function(e)
-        {
-process.exit(1)
-        });
+  client.connectRTUBuffered ("/dev/ttyUSB0", { baudRate: 2400, parity: "none", dataBits: 8, stopBits: 1 })
+  .then(async function()
+  {
+    doPoll()
+  })
+  .catch(function(e)
+  {
+    console.error("killing",e)
+    process.exit(1)
+  });
+}
+
+var asyncWait = (ms) => {return new Promise((resolve, reject) => {setTimeout(() => {resolve()}, ms)})}
+
+var doPoll = async function () {
+  console.log("poll 1")
+  await readModbusData(1)
+  await asyncWait(100)
+  console.log("poll 2")
+  await readModbusData(2)
+  await asyncWait(100)
+  console.log("poll 3")
+  await readModbusData(3)
+  await asyncWait(100)
+  console.log("wait")
+  setTimeout(doPoll, 3000);
 }
 
 var readModbusData = async function(id)
 {
-client.setID(id)
-const response = await client.poll({
+  client.setID(id)
+  const response = await client.poll({
     unit: id,
     map: [
-        { fc: 4, address: [0,6,70], type: "float" },
+        { fc: 4, address: [0,6,12,70], type: "float" },
     ],
     onProgress: (progress, data) => {
     },
     maxChunkSize: 32,  // max registers per request
     skipErrors: false, // if false it will stop poll and return PARTIAL result
-})
-if(response.error) {
-  await mqttclient.publish('modbus/'+id+'/error', JSON.stringify(response))
-} else {
- for(var o of response.data) {
-  await mqttclient.publish('modbus/'+id+'/'+o.address, JSON.stringify(o.value))
- }
-}
-return response
+  })
+  if(response.error) {
+    console.error(response.error.name)
+    response.error.request.result = null
+    await mqttclient.publish('modbus/'+id+'/error', JSON.stringify(response.error))
+  } else {
+    for(var o of response.data) {
+      await mqttclient.publish('modbus/'+id+'/'+o.address, JSON.stringify(o.value))
+      await mqttclient.publish('modbus/'+id+'/error', "")
+    }
+  }
+  return response
 };
 
 
