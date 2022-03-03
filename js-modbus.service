@@ -1,0 +1,11 @@
+[Unit]
+Description=js-modbus
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /root/js-modbus/main.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

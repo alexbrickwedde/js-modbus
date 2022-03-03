@@ -30,16 +30,12 @@ function doModbus() {
 var asyncWait = (ms) => {return new Promise((resolve, reject) => {setTimeout(() => {resolve()}, ms)})}
 
 var doPoll = async function () {
-  console.log("poll 1")
   await readModbusData(1)
   await asyncWait(100)
-  console.log("poll 2")
   await readModbusData(2)
   await asyncWait(100)
-  console.log("poll 3")
   await readModbusData(3)
   await asyncWait(100)
-  console.log("wait")
   setTimeout(doPoll, 3000);
 }
 
