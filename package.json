@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "modbus-serial": "^8.0.5",
-    "mqtt": "^4.3.6"
+    "mqtt": "^4.3.6",
+    "smartmeter-obis": ""
   }
 }
