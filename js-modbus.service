@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/node /root/js-modbus/main.js
+ExecStart=/usr/bin/node /opt/js-modbus/main.js
 Restart=on-failure
 
 [Install]
