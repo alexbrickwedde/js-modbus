@@ -97,9 +97,9 @@ async function displayData(err, obisResult) {
         return;
     }
     await mqttclient.publish('modbus/0/json', JSON.stringify(obisResult))
-    await mqttclient.publish('modbus/0/power', JSON.stringify(obisResult["1-0:16.7.0*255"].valueToString()))
-    await mqttclient.publish('modbus/0/bezug', JSON.stringify(obisResult["1-0:1.8.0*255"].valueToString()))
-    await mqttclient.publish('modbus/0/lieferung', JSON.stringify(obisResult["1-0:2.8.0*255"].valueToString()))
+    await mqttclient.publish('modbus/0/power', JSON.stringify(obisResult["1-0:16.7.0*255"].values[0].value))
+    await mqttclient.publish('modbus/0/bezug', JSON.stringify(obisResult["1-0:1.8.0*255"].values[0].value))
+    await mqttclient.publish('modbus/0/lieferung', JSON.stringify(obisResult["1-0:2.8.0*255"].values[0].value))
     return;
     for (var obisId in obisResult) {
         console.log(
